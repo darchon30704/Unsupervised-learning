@@ -1,0 +1,1111 @@
+\documentclass[11pt,]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Unsupervised learning - clustering and dimension reduction},
+            pdfauthor={Anna Yeaton},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Unsupervised learning - clustering and dimension reduction}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Anna Yeaton}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{Fall 2018}
+
+
+\begin{document}
+\maketitle
+
+\hypertarget{lab-section}{%
+\section{Lab Section}\label{lab-section}}
+
+Download auto data from the github page
+\url{https://github.com/ayeaton/BMSC-GA-4439-Fall2018/blob/master/Auto.data.txt}
+or the \emph{Statistical Learning} book website here:
+\url{http://www-bcf.usc.edu/~gareth/ISL/data.html}
+
+Today, we are going over Hierarchical clustering, K-Means Clustering,
+PCA, ICA, and NMF.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#set your working directory }
+\CommentTok{#setwd("")}
+\NormalTok{Auto_data <-}\StringTok{ }\KeywordTok{read.table}\NormalTok{(}\StringTok{"Auto.data.txt"}\NormalTok{, }\DataTypeTok{header=}\NormalTok{T, }\DataTypeTok{stringsAsFactors =}\NormalTok{ F)}
+
+\KeywordTok{View}\NormalTok{(Auto_data)}
+
+\CommentTok{#remove cars with unknown horsepower and set horsepower to numeric}
+\NormalTok{Auto_data <-}\StringTok{ }\NormalTok{Auto_data[}\OperatorTok{-}\KeywordTok{which}\NormalTok{(Auto_data}\OperatorTok{$}\NormalTok{horsepower }\OperatorTok{==}\StringTok{ "?"}\NormalTok{),]}
+\NormalTok{Auto_data}\OperatorTok{$}\NormalTok{horsepower <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(Auto_data}\OperatorTok{$}\NormalTok{horsepower)}
+\KeywordTok{str}\NormalTok{(Auto_data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    392 obs. of  9 variables:
+##  $ mpg         : num  18 15 18 16 17 15 14 14 14 15 ...
+##  $ cylinders   : int  8 8 8 8 8 8 8 8 8 8 ...
+##  $ displacement: num  307 350 318 304 302 429 454 440 455 390 ...
+##  $ horsepower  : num  130 165 150 150 140 198 220 215 225 190 ...
+##  $ weight      : num  3504 3693 3436 3433 3449 ...
+##  $ acceleration: num  12 11.5 11 12 10.5 10 9 8.5 10 8.5 ...
+##  $ year        : int  70 70 70 70 70 70 70 70 70 70 ...
+##  $ origin      : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ name        : chr  "chevrolet chevelle malibu" "buick skylark 320" "plymouth satellite" "amc rebel sst" ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{str}\NormalTok{(Auto_data}\OperatorTok{$}\NormalTok{horsepower)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  num [1:392] 130 165 150 150 140 198 220 215 225 190 ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#save car names }
+\NormalTok{Auto_data_names <-}\StringTok{ }\NormalTok{Auto_data}\OperatorTok{$}\NormalTok{name}
+
+\CommentTok{#use only fields with numeric values}
+\NormalTok{Auto_data_clust <-}\StringTok{ }\NormalTok{Auto_data[,}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{]}
+
+\KeywordTok{dim}\NormalTok{(Auto_data_clust)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 392   8
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{print}\NormalTok{(}\StringTok{"Auto_data_clust"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Auto_data_clust"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{str}\NormalTok{(Auto_data_clust)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    392 obs. of  8 variables:
+##  $ mpg         : num  18 15 18 16 17 15 14 14 14 15 ...
+##  $ cylinders   : int  8 8 8 8 8 8 8 8 8 8 ...
+##  $ displacement: num  307 350 318 304 302 429 454 440 455 390 ...
+##  $ horsepower  : num  130 165 150 150 140 198 220 215 225 190 ...
+##  $ weight      : num  3504 3693 3436 3433 3449 ...
+##  $ acceleration: num  12 11.5 11 12 10.5 10 9 8.5 10 8.5 ...
+##  $ year        : int  70 70 70 70 70 70 70 70 70 70 ...
+##  $ origin      : int  1 1 1 1 1 1 1 1 1 1 ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#392 is too much for a demo, so lets take the first 25}
+\NormalTok{Auto_data_clust <-}\StringTok{ }\NormalTok{Auto_data_clust[}\DecValTok{1}\OperatorTok{:}\DecValTok{25}\NormalTok{,]}
+\KeywordTok{rownames}\NormalTok{(Auto_data_clust) <-}\StringTok{ }\NormalTok{Auto_data_names[}\DecValTok{1}\OperatorTok{:}\DecValTok{25}\NormalTok{]}
+\KeywordTok{print}\NormalTok{(}\StringTok{"ONLY the first 25 Auto_data_clust"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "ONLY the first 25 Auto_data_clust"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{str}\NormalTok{(Auto_data_clust)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    25 obs. of  8 variables:
+##  $ mpg         : num  18 15 18 16 17 15 14 14 14 15 ...
+##  $ cylinders   : int  8 8 8 8 8 8 8 8 8 8 ...
+##  $ displacement: num  307 350 318 304 302 429 454 440 455 390 ...
+##  $ horsepower  : num  130 165 150 150 140 198 220 215 225 190 ...
+##  $ weight      : num  3504 3693 3436 3433 3449 ...
+##  $ acceleration: num  12 11.5 11 12 10.5 10 9 8.5 10 8.5 ...
+##  $ year        : int  70 70 70 70 70 70 70 70 70 70 ...
+##  $ origin      : int  1 1 1 1 1 1 1 1 1 1 ...
+\end{verbatim}
+
+\hypertarget{hierarchical-agglomerative-clustering}{%
+\subsection{Hierarchical agglomerative
+clustering}\label{hierarchical-agglomerative-clustering}}
+
+Step 1. Assign each item to it's own cluster. We start with 25 clusters,
+one for each car.
+
+Step 2. Calculate a similarity matrix between each cluster.
+
+Step 3. Find the pair of clusters closest in similarity.
+
+Step 4. Merge these clusters/recalculate similarity between clusters.
+Options are: single linkage (nearest neighbor), complete linkage
+(furthest neighbor), average linkage (mean distance between all pairs of
+data from the two different clusters), centroid linkage (distance
+between the means of all points in the clusters). Now we have 24
+clusters.
+
+Step 5. Repeat Step 3 and 4 until there is only one cluster.
+
+\hypertarget{in-practice}{%
+\subsubsection{In practice}\label{in-practice}}
+
+Step 1. Each car is a cluster.
+
+Step 2. Create a distance matrix from Auto\_data\_clust.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#help("dist")}
+\NormalTok{hierarchical_dist <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(}\KeywordTok{dist}\NormalTok{(Auto_data_clust, }\DataTypeTok{method =} \StringTok{"euclidean"}\NormalTok{))}
+\CommentTok{#View(hierarchical_dist)}
+\end{Highlighting}
+\end{Shaded}
+
+Step 3. Find the two cars that are the most similar to each other and
+print the names of those two cars
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{diag}\NormalTok{(hierarchical_dist) <-}\StringTok{ }\OtherTok{NA}
+\KeywordTok{arrayInd}\NormalTok{(}\KeywordTok{which.min}\NormalTok{(hierarchical_dist), }\KeywordTok{dim}\NormalTok{(hierarchical_dist))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2]
+## [1,]   23   15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#postitions 23 and 15 are the most similar. Lets go back to the names of the cars}
+\NormalTok{Auto_data_names[}\DecValTok{23}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "saab 99e"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Auto_data_names[}\DecValTok{15}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "toyota corona mark ii"
+\end{verbatim}
+
+Step 4. Merge the two clusters together using average linkage.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#replace pos 15 with the average of pos 15 and 23}
+\NormalTok{hierarchical_dist[,}\DecValTok{15}\NormalTok{] <-}\StringTok{ }\KeywordTok{apply}\NormalTok{((hierarchical_dist[,}\KeywordTok{c}\NormalTok{(}\DecValTok{23}\NormalTok{,}\DecValTok{15}\NormalTok{)]),}\DecValTok{1}\NormalTok{,mean)}
+\NormalTok{hierarchical_dist[}\DecValTok{15}\NormalTok{,] <-}\StringTok{ }\KeywordTok{apply}\NormalTok{((hierarchical_dist[}\KeywordTok{c}\NormalTok{(}\DecValTok{23}\NormalTok{,}\DecValTok{15}\NormalTok{),]),}\DecValTok{2}\NormalTok{,mean)}
+
+\CommentTok{#remove pos 23}
+\NormalTok{hierarchical_dist <-}\StringTok{ }\NormalTok{hierarchical_dist[}\OperatorTok{-}\DecValTok{23}\NormalTok{,}\OperatorTok{-}\DecValTok{23}\NormalTok{]}
+
+\CommentTok{#now position 15 represents the cluster containing the saab99e and the toyota corona mark ii}
+\end{Highlighting}
+\end{Shaded}
+
+Step 5. To complete the algorithm, go back to step 3 and iterate through
+all of the previous steps until there are no more rows left
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#Step 3. Find the two cars that are the most similar to each other and print the names of those two cars}
+\KeywordTok{diag}\NormalTok{(hierarchical_dist) <-}\StringTok{ }\OtherTok{NA}
+\KeywordTok{arrayInd}\NormalTok{(}\KeywordTok{which.min}\NormalTok{(hierarchical_dist), }\KeywordTok{dim}\NormalTok{(hierarchical_dist))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2]
+## [1,]    4    3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#postitions 23 and 15 are the most similar. Lets go back to the names of the cars}
+\NormalTok{Auto_data_names[}\DecValTok{4}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "amc rebel sst"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Auto_data_names[}\DecValTok{3}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "plymouth satellite"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#postitions 4 and 3 are the most similar}
+
+\CommentTok{#replace pos 3 with the average of pos 3 and 4}
+\NormalTok{hierarchical_dist[,}\DecValTok{3}\NormalTok{] <-}\StringTok{ }\KeywordTok{apply}\NormalTok{((hierarchical_dist[,}\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\DecValTok{3}\NormalTok{)]),}\DecValTok{1}\NormalTok{,mean)}
+\NormalTok{hierarchical_dist[}\DecValTok{3}\NormalTok{,] <-}\StringTok{ }\KeywordTok{apply}\NormalTok{((hierarchical_dist[}\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\DecValTok{3}\NormalTok{),]),}\DecValTok{2}\NormalTok{,mean)}
+
+\CommentTok{#remove pos 4}
+\NormalTok{hierarchical_dist <-}\StringTok{ }\NormalTok{hierarchical_dist[}\OperatorTok{-}\DecValTok{4}\NormalTok{,}\OperatorTok{-}\DecValTok{4}\NormalTok{]}
+
+\CommentTok{#now position 3 represents the cluster containing the amc rebel sst and the plymouth satellite}
+\end{Highlighting}
+\end{Shaded}
+
+REPEAT. Find the two cars that are the most similar to each other and
+print the names of those two cars
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{diag}\NormalTok{(hierarchical_dist) <-}\StringTok{ }\OtherTok{NA}
+\KeywordTok{arrayInd}\NormalTok{(}\KeywordTok{which.min}\NormalTok{(hierarchical_dist), }\KeywordTok{dim}\NormalTok{(hierarchical_dist))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2]
+## [1,]    4    3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#postitions 6 and 4 are the most similar. Lets go back to the names of the cars}
+\NormalTok{Auto_data_names[}\DecValTok{6}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "ford galaxie 500"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Auto_data_names[}\DecValTok{4}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "amc rebel sst"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#postitions 6 and 4 are the most similar}
+
+\CommentTok{#replace pos 4 with the average of pos 6 and 4}
+\NormalTok{hierarchical_dist[,}\DecValTok{4}\NormalTok{] <-}\StringTok{ }\KeywordTok{apply}\NormalTok{((hierarchical_dist[,}\KeywordTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\DecValTok{4}\NormalTok{)]),}\DecValTok{1}\NormalTok{,mean)}
+\NormalTok{hierarchical_dist[}\DecValTok{4}\NormalTok{,] <-}\StringTok{ }\KeywordTok{apply}\NormalTok{((hierarchical_dist[}\KeywordTok{c}\NormalTok{(}\DecValTok{6}\NormalTok{,}\DecValTok{4}\NormalTok{),]),}\DecValTok{2}\NormalTok{,mean)}
+
+\CommentTok{#remove pos 4}
+\NormalTok{hierarchical_dist <-}\StringTok{ }\NormalTok{hierarchical_dist[}\OperatorTok{-}\DecValTok{6}\NormalTok{,}\OperatorTok{-}\DecValTok{6}\NormalTok{]}
+
+\CommentTok{#now position 6 represents the cluster containing the ford galaxie 500 and amc rebel sst}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{diag}\NormalTok{(hierarchical_dist) <-}\StringTok{ }\OtherTok{NA}
+\KeywordTok{arrayInd}\NormalTok{(}\KeywordTok{which.min}\NormalTok{(hierarchical_dist), }\KeywordTok{dim}\NormalTok{(hierarchical_dist))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2]
+## [1,]    6    5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#postitions 5 and 4 are the most similar. Lets go back to the names of the cars}
+\NormalTok{Auto_data_names[}\DecValTok{5}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "ford torino"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Auto_data_names[}\DecValTok{4}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "amc rebel sst"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#postitions 5 and 4 are the most similar}
+
+\CommentTok{#replace pos 4 with the average of pos 5 and 4}
+\NormalTok{hierarchical_dist[,}\DecValTok{4}\NormalTok{] <-}\StringTok{ }\KeywordTok{apply}\NormalTok{((hierarchical_dist[,}\KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{4}\NormalTok{)]),}\DecValTok{1}\NormalTok{,mean)}
+\NormalTok{hierarchical_dist[}\DecValTok{4}\NormalTok{,] <-}\StringTok{ }\KeywordTok{apply}\NormalTok{((hierarchical_dist[}\KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{4}\NormalTok{),]),}\DecValTok{2}\NormalTok{,mean)}
+
+\CommentTok{#remove pos 4}
+\NormalTok{hierarchical_dist <-}\StringTok{ }\NormalTok{hierarchical_dist[}\OperatorTok{-}\DecValTok{5}\NormalTok{,}\OperatorTok{-}\DecValTok{5}\NormalTok{]}
+
+\CommentTok{#now position 5 represents the cluster containing the ford torino and amc rebel sst}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{r-function}{%
+\subsubsection{R function}\label{r-function}}
+
+Now that we know how the algorithm works, let's use the R function
+hclust. Plot the Dendogram resulting from clustering the
+Auto\_data\_clust using average linkage.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#help(hclust)}
+\KeywordTok{help}\NormalTok{(hclust)}
+\NormalTok{hierarchical_dist <-}\StringTok{ }\KeywordTok{dist}\NormalTok{(Auto_data_clust, }\DataTypeTok{method =} \StringTok{"euclidean"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{hclust}\NormalTok{(hierarchical_dist), }\DataTypeTok{method =} \StringTok{"average"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in graphics:::plotHclust(n1, merge, height, order(x$order), hang, :
+## "method" is not a graphical parameter
+
+## Warning in graphics:::plotHclust(n1, merge, height, order(x$order), hang, :
+## "method" is not a graphical parameter
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in axis(2, at = pretty(range(height)), ...): "method" is not a
+## graphical parameter
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in title(main = main, sub = sub, xlab = xlab, ylab = ylab, ...):
+## "method" is not a graphical parameter
+\end{verbatim}
+
+\includegraphics{Clustering_student_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\newpage
+
+\#\#K-Means Clustering
+
+Step 1. Choose N number of clusters.
+
+Step 2. Find the N items that are furthest apart and set them as cluster
+centroids.
+
+Step 3. Assign one item in the dataset to the closest of the N cluster
+centroids.
+
+Step 4. Recalculate the cluster centroid.
+
+Step 5. Repeat Steps 3 and 4 until all items are in a cluster.
+
+Step 6. Go through each item and reassess whether the item belongs in
+the current cluster or in a different cluster based on distance to
+cluster centroids. Every time an item is reassigned to a different
+cluster, the centroids must be recalculated.
+
+Step 7. When every item belongs firmly to a cluster, or the iterations
+of Step 6 are endless, the algorithm is complete.
+
+\hypertarget{in-practice-1}{%
+\subsubsection{In practice}\label{in-practice-1}}
+
+Step 1. We are going to cluster the 25 cars into two groups.
+
+Step 2a. Find the two cars furthest from each other.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{kmeans_dist <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(}\KeywordTok{dist}\NormalTok{(Auto_data_clust, }\DataTypeTok{method =} \StringTok{"euclidean"}\NormalTok{))}
+\KeywordTok{diag}\NormalTok{(kmeans_dist) <-}\StringTok{ }\OtherTok{NA}
+\KeywordTok{arrayInd}\NormalTok{(}\KeywordTok{which.max}\NormalTok{(kmeans_dist), }\KeywordTok{dim}\NormalTok{(kmeans_dist))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2]
+## [1,]   20    9
+\end{verbatim}
+
+Step 2b. Create data frames to hold each cluster, cluster names, and
+centroids.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cluster_one <-}\StringTok{ }\NormalTok{Auto_data_clust[}\DecValTok{20}\NormalTok{,]}
+\NormalTok{cluster_one_names <-}\StringTok{ }\NormalTok{Auto_data_names[}\DecValTok{20}\NormalTok{]}
+\NormalTok{cluster_one_centroid <-}\StringTok{ }\NormalTok{cluster_one}
+
+\NormalTok{cluster_two <-}\StringTok{ }\NormalTok{Auto_data_clust[}\DecValTok{9}\NormalTok{,]}
+\NormalTok{cluster_two_names <-}\StringTok{ }\NormalTok{Auto_data_names[}\DecValTok{20}\NormalTok{]}
+\NormalTok{cluster_two_centroid <-}\StringTok{ }\NormalTok{cluster_two}
+\end{Highlighting}
+\end{Shaded}
+
+Step 3a. Sequentially put cars in either cluster one or cluster two.
+lets start with car 1. Is car 1 closer to cluster one or cluster two?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#distance to cluster 1}
+\KeywordTok{dist}\NormalTok{(}\KeywordTok{rbind}\NormalTok{(cluster_one_centroid,Auto_data_clust[}\DecValTok{1}\NormalTok{,]), }\DataTypeTok{method =} \StringTok{"euclidean"}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                           volkswagen 1131 deluxe sedan
+## chevrolet chevelle malibu                     1684.301
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#distance to cluster 2}
+\KeywordTok{dist}\NormalTok{(}\KeywordTok{rbind}\NormalTok{(cluster_two_centroid,Auto_data_clust[}\DecValTok{1}\NormalTok{,]), }\DataTypeTok{method =} \StringTok{"euclidean"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                           pontiac catalina
+## chevrolet chevelle malibu         937.6513
+\end{verbatim}
+
+Step 3b. Add car 1 to cluster two and adjust the centroid value for
+cluster 2. The new centroid value is a mean of the values of cars in
+that cluster.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cluster_two <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(cluster_two, Auto_data_clust[}\DecValTok{1}\NormalTok{,])}
+\NormalTok{cluster_two_names <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(cluster_two_names, Auto_data_names[}\DecValTok{1}\NormalTok{])}
+\NormalTok{cluster_two_centroid <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(cluster_two,}\DecValTok{2}\NormalTok{,}\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{mean}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(x)))}
+\end{Highlighting}
+\end{Shaded}
+
+Step 3d. Do for all cars
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(Auto_data_clust))\{}
+  \ControlFlowTok{if}\NormalTok{(i }\OperatorTok{==}\StringTok{ }\DecValTok{9} \OperatorTok{|}\StringTok{ }\NormalTok{i }\OperatorTok{==}\StringTok{ }\DecValTok{20}\NormalTok{)\{}
+    \ControlFlowTok{next}
+\NormalTok{  \}}
+  \ControlFlowTok{if}\NormalTok{(}\KeywordTok{dist}\NormalTok{(}\KeywordTok{rbind}\NormalTok{(cluster_two_centroid,Auto_data_clust[i,]), }\DataTypeTok{method =} \StringTok{"euclidean"}\NormalTok{) }\OperatorTok{<}\StringTok{ }\KeywordTok{dist}\NormalTok{(}\KeywordTok{rbind}\NormalTok{(cluster_one_centroid,Auto_data_clust[i,]), }\DataTypeTok{method =} \StringTok{"euclidean"}\NormalTok{) ) \{}
+\NormalTok{    cluster_two <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(cluster_two, Auto_data_clust[i,])}
+\NormalTok{    cluster_two_names <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(cluster_two_names, Auto_data_names[i])}
+\NormalTok{    cluster_two_centroid <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(cluster_two,}\DecValTok{2}\NormalTok{,}\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{mean}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(x)))}
+\NormalTok{  \}}\ControlFlowTok{else}\NormalTok{\{}
+\NormalTok{    cluster_one <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(cluster_one, Auto_data_clust[i,])}
+\NormalTok{    cluster_one_names <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(cluster_one_names, Auto_data_names[i])}
+\NormalTok{    cluster_one_centroid <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(cluster_one,}\DecValTok{2}\NormalTok{,}\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{mean}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(x)))}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Step 4. Adjust the clusters by comparing the distance of each car to the
+centroid of its current cluster versus the distance to the centroid of
+the other cluster. Does it still belong in the current cluster? lets
+start with car 1. Does it belong in cluster two?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#does car 1 belong in cluster 2}
+\KeywordTok{dist}\NormalTok{(}\KeywordTok{dist}\NormalTok{(}\KeywordTok{rbind}\NormalTok{(cluster_one_centroid, Auto_data_clust[}\DecValTok{1}\NormalTok{,] )))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                 1
+## chevrolet chevelle malibu 1517.83
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dist}\NormalTok{(}\KeywordTok{dist}\NormalTok{(}\KeywordTok{rbind}\NormalTok{(cluster_one_centroid, Auto_data_clust[}\DecValTok{1}\NormalTok{,] )))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                 1
+## chevrolet chevelle malibu 1517.83
+\end{verbatim}
+
+Alright, so car 1 does belong in cluster two. To complete the algorithm,
+iterate over the cars until none of the cars switch clusters.
+
+\hypertarget{r-function-1}{%
+\subsubsection{R function}\label{r-function-1}}
+
+Now we know how the algorithm works, lets use the R function kmeans.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{help}\NormalTok{(kmeans)}
+\NormalTok{kmeans_put <-}\StringTok{ }\KeywordTok{kmeans}\NormalTok{(Auto_data_clust,}\DecValTok{2}\NormalTok{)}
+\KeywordTok{str}\NormalTok{(kmeans_put)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## List of 9
+##  $ cluster     : Named int [1:25] 1 1 1 1 1 1 1 1 1 1 ...
+##   ..- attr(*, "names")= chr [1:25] "chevrolet chevelle malibu" "buick skylark 320" "plymouth satellite" "amc rebel sst" ...
+##  $ centers     : num [1:2, 1:8] 15.4 22.8 8 5 374.8 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : chr [1:2] "1" "2"
+##   .. ..$ : chr [1:8] "mpg" "cylinders" "displacement" "horsepower" ...
+##  $ totss       : num 14590082
+##  $ withinss    : num [1:2] 1883289 1407639
+##  $ tot.withinss: num 3290927
+##  $ betweenss   : num 11299155
+##  $ size        : int [1:2] 13 12
+##  $ iter        : int 1
+##  $ ifault      : int 0
+##  - attr(*, "class")= chr "kmeans"
+\end{verbatim}
+
+\newpage
+
+\hypertarget{principal-components-analysis-pca}{%
+\subsection{Principal Components Analysis
+(PCA)}\label{principal-components-analysis-pca}}
+
+Principal Components Analysis is a linear dimensionality reduction
+algorithm. If you want to learn more about linear algebra, I suggest the
+MIT Open Courseware class here :
+\url{https://ocw.mit.edu/courses/mathematics/18-06-linear-algebra-spring-2010/}
+There are two ways of doing PCA, Single Value Decomposition (SVD), and
+the method we will use today, using the covariance matrix of the data.
+SVD is not constrained to square matrices.
+
+Step 1. Center data by subtracting the mean.
+
+Step 2. Calculate covariance matrix of data.
+
+Step 3. Perform Eigendecomposition of the covariance matrix.
+i.e.~represent the matrix in terms of it's eigenvalues and eigen vectors
+
+Step 4. Multiply the eigen vectors by the original data to express the
+data in terms of the eigen vectors.
+
+Step 1. Center the data by subtracting the mean of the each column from
+the values in that column
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#we need a square matrix}
+\NormalTok{Auto_data_clust_pca <-}\StringTok{ }\KeywordTok{data.matrix}\NormalTok{(Auto_data_clust[}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{,])}
+
+\NormalTok{Center_auto <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(Auto_data_clust_pca, }\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) x }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(x))}
+\KeywordTok{str}\NormalTok{(Auto_data_clust_pca)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  num [1:8, 1:8] 18 15 18 16 17 15 14 14 8 8 ...
+##  - attr(*, "dimnames")=List of 2
+##   ..$ : chr [1:8] "chevrolet chevelle malibu" "buick skylark 320" "plymouth satellite" "amc rebel sst" ...
+##   ..$ : chr [1:8] "mpg" "cylinders" "displacement" "horsepower" ...
+\end{verbatim}
+
+Step 2. Calculate covariance matrix of the Auto data
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Covariance_auto <-}\StringTok{ }\KeywordTok{cov}\NormalTok{(Center_auto)}
+\end{Highlighting}
+\end{Shaded}
+
+Step 3. Calculate eigen values and vectors
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Eigen_value_auto <-}\StringTok{ }\KeywordTok{eigen}\NormalTok{(Covariance_auto)}\OperatorTok{$}\NormalTok{value}
+
+\CommentTok{#columns are the eigen vectors}
+\NormalTok{Eigen_vector_auto <-}\StringTok{ }\KeywordTok{eigen}\NormalTok{(Covariance_auto)}\OperatorTok{$}\NormalTok{vector}
+\end{Highlighting}
+\end{Shaded}
+
+Step 4. Multiply the eigen vector matrix by the original data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#?%*%}
+\NormalTok{PC <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{data.matrix}\NormalTok{(Center_auto) }\OperatorTok{%*%}\StringTok{ }\NormalTok{Eigen_vector_auto)}
+
+\KeywordTok{ggplot}\NormalTok{(PC, }\KeywordTok{aes}\NormalTok{(PC[,}\DecValTok{1}\NormalTok{], PC[,}\DecValTok{2}\NormalTok{])) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(PC[,}\DecValTok{1}\NormalTok{], PC[,}\DecValTok{2}\NormalTok{]))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Clustering_student_files/figure-latex/unnamed-chunk-19-1.pdf}
+
+Step 5. Find out which principal components explain the variance in the
+data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#for each component, take the cumulative sum of eigen values up to that point and and divide by the total sum of eigen values}
+\KeywordTok{round}\NormalTok{(}\KeywordTok{cumsum}\NormalTok{(Eigen_value_auto)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(Eigen_value_auto) }\OperatorTok{*}\StringTok{ }\DecValTok{100}\NormalTok{, }\DataTypeTok{digits =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1]  99.99 100.00 100.00 100.00 100.00 100.00 100.00 100.00
+\end{verbatim}
+
+Principal component 1 and 2 explain 99.99 percent of the variance.
+Principal component 1,2, and 3 together explain 100\% of the variance in
+the data.
+
+\hypertarget{r-function-2}{%
+\subsubsection{R function}\label{r-function-2}}
+
+Now that we know how PCA works, lets use the R funtion prcomp.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{help}\NormalTok{(}\StringTok{"prcomp"}\NormalTok{)}
+\KeywordTok{autoplot}\NormalTok{(}\KeywordTok{prcomp}\NormalTok{(}\KeywordTok{t}\NormalTok{(Auto_data_clust_pca)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Clustering_student_files/figure-latex/unnamed-chunk-21-1.pdf}
+
+\newpage
+
+\hypertarget{independent-component-analysis-ica}{%
+\subsection{Independent Component Analysis
+(ICA)}\label{independent-component-analysis-ica}}
+
+ICA is an algorithm that finds components that are independent, or
+subcomponents of the data.
+
+Step 1. Whiten the data by projecting the data onto the eigen vectors
+(PCA).
+
+Step 2. Solve the X=AS equation by maximizing non-gaussianty in the
+variables(components) in S.
+
+This results in a matrix S with components that are independent from
+each other.
+
+We will use the fastICA algorithm.
+
+But first we will go backwards. Create a matrix S with the independent
+components
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#create two signals}
+\NormalTok{S <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(}\KeywordTok{cos}\NormalTok{((}\DecValTok{1}\OperatorTok{:}\DecValTok{500}\NormalTok{)}\OperatorTok{/}\DecValTok{10}\NormalTok{), ((}\DecValTok{500}\OperatorTok{:}\DecValTok{1}\NormalTok{)}\OperatorTok{/}\DecValTok{1000}\NormalTok{))}
+
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfcol =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\KeywordTok{plot}\NormalTok{(S[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{type=}\StringTok{"l"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(S[,}\DecValTok{2}\NormalTok{], }\DataTypeTok{type=}\StringTok{"l"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Clustering_student_files/figure-latex/unnamed-chunk-22-1.pdf}
+
+Create a mixing matrix A
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{A <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{, }\FloatTok{0.7}\NormalTok{, }\FloatTok{0.423}\NormalTok{, }\FloatTok{0.857}\NormalTok{), }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Mix S using A
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{X <-}\StringTok{ }\NormalTok{S }\OperatorTok{%*%}\StringTok{ }\NormalTok{A}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfcol =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\KeywordTok{plot}\NormalTok{(X[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{type=}\StringTok{"l"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(X[,}\DecValTok{2}\NormalTok{], }\DataTypeTok{type=}\StringTok{"l"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Clustering_student_files/figure-latex/unnamed-chunk-24-1.pdf}
+
+Unmix using fastICA
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfcol =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\KeywordTok{plot}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{500}\NormalTok{, a}\OperatorTok{$}\NormalTok{S[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{type =} \StringTok{"l"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"S'1"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{""}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{500}\NormalTok{, a}\OperatorTok{$}\NormalTok{S[,}\DecValTok{2}\NormalTok{], }\DataTypeTok{type =} \StringTok{"l"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"S'2"}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{""}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Clustering_student_files/figure-latex/unnamed-chunk-26-1.pdf}
+
+\hypertarget{ica-on-the-auto-data}{%
+\subsubsection{ICA on the auto data}\label{ica-on-the-auto-data}}
+
+plot the independent components as a heatmap
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{heatmap}\NormalTok{(a}\OperatorTok{$}\NormalTok{S)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Clustering_student_files/figure-latex/unnamed-chunk-28-1.pdf}
+
+\newpage
+
+\hypertarget{non-negative-matrix-factorization}{%
+\subsection{Non-negative Matrix
+Factorization}\label{non-negative-matrix-factorization}}
+
+NMF is an algorithm that factorizes the given matrix into two matrices.
+All three matrices must have no negative values.
+
+\[V_{mxn}=W_{mxp}H_{pxn}\] Where p is specified to the algorithm. p can
+be thought of as the number of features to search for. The column vector
+W can be thought of as the features, and the vector H van be thought of
+as the weights for these features.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Auto_data_clust <-}\StringTok{ }\NormalTok{Auto_data[,}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{]}
+
+\NormalTok{nmf_out <-}\StringTok{ }\KeywordTok{nmf}\NormalTok{(Auto_data_clust, }\DecValTok{4}\NormalTok{, }\KeywordTok{set.seed}\NormalTok{(}\DecValTok{304543}\NormalTok{), }\DataTypeTok{nrun=} \DecValTok{100}\NormalTok{)}
+\NormalTok{W <-}\StringTok{ }\NormalTok{nmf_out}\OperatorTok{@}\NormalTok{fit}\OperatorTok{@}\NormalTok{W}
+\NormalTok{H <-}\StringTok{ }\NormalTok{nmf_out}\OperatorTok{@}\NormalTok{fit}\OperatorTok{@}\NormalTok{H}
+
+\CommentTok{#W}
+\KeywordTok{basismap}\NormalTok{(nmf_out)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Clustering_student_files/figure-latex/unnamed-chunk-29-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#H}
+\KeywordTok{coefmap}\NormalTok{(nmf_out)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Clustering_student_files/figure-latex/unnamed-chunk-29-2.pdf}
+\newpage
+
+\#\#\#Homework
+
+EXAMPLE CODE
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# load the crab data}
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{library}\NormalTok{(MASS)}
+\KeywordTok{data}\NormalTok{(crabs)}
+\NormalTok{crabs <-}\StringTok{ }\KeywordTok{within}\NormalTok{(crabs,\{}
+  \KeywordTok{levels}\NormalTok{(sp)  <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'Blue'}\NormalTok{,}\StringTok{'Orange'}\NormalTok{)}
+  \KeywordTok{levels}\NormalTok{(sex) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'Female'}\NormalTok{,}\StringTok{'Male'}\NormalTok{)}
+\NormalTok{\})}
+
+
+\CommentTok{# Perform PCA on the data}
+\CommentTok{# retx returns the scores for each crab}
+\CommentTok{# Append the components for each crab to the original data}
+\NormalTok{crab.pca <-}\StringTok{ }\KeywordTok{prcomp}\NormalTok{(crabs[,}\DecValTok{4}\OperatorTok{:}\DecValTok{8}\NormalTok{],}\DataTypeTok{retx=}\OtherTok{TRUE}\NormalTok{)}
+\NormalTok{crabs}\OperatorTok{$}\NormalTok{PC1 <-}\StringTok{ }\NormalTok{crab.pca}\OperatorTok{$}\NormalTok{x[,}\DecValTok{1}\NormalTok{]}
+\NormalTok{crabs}\OperatorTok{$}\NormalTok{PC2 <-}\StringTok{ }\NormalTok{crab.pca}\OperatorTok{$}\NormalTok{x[,}\DecValTok{2}\NormalTok{]}
+\NormalTok{crabs}\OperatorTok{$}\NormalTok{PC3 <-}\StringTok{ }\NormalTok{crab.pca}\OperatorTok{$}\NormalTok{x[,}\DecValTok{3}\NormalTok{]}
+
+\CommentTok{# Print the rounded scores for the first three components}
+\KeywordTok{write.table}\NormalTok{(}\KeywordTok{signif}\NormalTok{(crab.pca}\OperatorTok{$}\NormalTok{rotation[,}\DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{],}\DecValTok{3}\NormalTok{),}\StringTok{"rotations.tab"}\NormalTok{)}
+
+\CommentTok{#}
+\CommentTok{# Plot discrimating factors found in the second component}
+\CommentTok{#}
+\NormalTok{second_component_dotplot <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(crabs, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{y =}\NormalTok{ CW, }\DataTypeTok{x =}\NormalTok{ RW))        }\OperatorTok{+}
+\StringTok{        }\KeywordTok{geom_point}\NormalTok{()                              }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_x_continuous}\NormalTok{(}\StringTok{"Rear width (mm)"}\NormalTok{)     }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_y_continuous}\NormalTok{(}\StringTok{"Carapace width (mm)"}\NormalTok{)}
+
+\KeywordTok{png}\NormalTok{(}\StringTok{"second_component_dotplot.png"}\NormalTok{); }\KeywordTok{print}\NormalTok{(second_component_dotplot)}
+
+\CommentTok{# }
+\CommentTok{# The second principle component corresponds to differences in }
+\CommentTok{# the ratio of carapace width to rear width}
+\CommentTok{#}
+\NormalTok{second_component_density <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(crabs, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ CW}\OperatorTok{/}\NormalTok{RW))                               }\OperatorTok{+}
+\StringTok{        }\KeywordTok{stat_density}\NormalTok{()                                              }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_x_continuous}\NormalTok{(}\StringTok{"Ratio of Carapace width to Rear width"}\NormalTok{) }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_y_continuous}\NormalTok{(}\StringTok{"Density"}\NormalTok{)}
+
+\KeywordTok{png}\NormalTok{(}\StringTok{"second_component_density.png"}\NormalTok{); }\KeywordTok{print}\NormalTok{(second_component_density)}
+
+\CommentTok{#}
+\CommentTok{# Discriminating factors for the third component}
+\CommentTok{#}
+\NormalTok{third_component_dotplot <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(crabs, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ CW, }\DataTypeTok{y =}\NormalTok{ BD))        }\OperatorTok{+}
+\StringTok{        }\KeywordTok{geom_point}\NormalTok{()                              }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_x_continuous}\NormalTok{(}\StringTok{"Carapace width (mm)"}\NormalTok{) }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_y_continuous}\NormalTok{(}\StringTok{"Body depth (mm)"}\NormalTok{)}
+
+\KeywordTok{png}\NormalTok{(}\StringTok{"third_component_dotplot.png"}\NormalTok{); }\KeywordTok{print}\NormalTok{(third_component_dotplot)}
+
+\CommentTok{#}
+\CommentTok{# The third component corresponds to body depth and carapace width}
+\CommentTok{#}
+\NormalTok{third_component_density <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(crabs, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ BD}\OperatorTok{/}\NormalTok{CW))                               }\OperatorTok{+}
+\StringTok{        }\KeywordTok{stat_density}\NormalTok{()                                              }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_x_continuous}\NormalTok{(}\StringTok{"Ratio of Body Depth to Carapace Width"}\NormalTok{) }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_y_continuous}\NormalTok{(}\StringTok{"Density"}\NormalTok{)}
+
+\KeywordTok{png}\NormalTok{(}\StringTok{"third_component_density.png"}\NormalTok{); }\KeywordTok{print}\NormalTok{(third_component_density)}
+
+
+\CommentTok{#}
+\CommentTok{# Plot crab species for each of the two variables}
+\CommentTok{#}
+\NormalTok{morphology <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(crabs, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ BD}\OperatorTok{/}\NormalTok{CW, }\DataTypeTok{y =}\NormalTok{ CW}\OperatorTok{/}\NormalTok{RW, }\DataTypeTok{pch=}\NormalTok{sex, }\DataTypeTok{col=}\NormalTok{sp, }\DataTypeTok{size=}\NormalTok{sex)) }\OperatorTok{+}
+\StringTok{        }\KeywordTok{geom_point}\NormalTok{()                                                        }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_x_continuous}\NormalTok{(}\StringTok{"Ratio of body depth to carapace width"}\NormalTok{)         }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_y_continuous}\NormalTok{(}\StringTok{"Ratio of carapace width to rear width"}\NormalTok{)         }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_shape_manual}\NormalTok{(}\StringTok{"Sex"}\NormalTok{,}\DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{15}\NormalTok{))                            }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_color_manual}\NormalTok{(}\StringTok{"Crab}\CharTok{\textbackslash{}n}\StringTok{Species"}\NormalTok{,}\DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{,}\StringTok{"orange3"}\NormalTok{))      }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_size_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\DecValTok{3}\NormalTok{),}\DataTypeTok{guide=}\OtherTok{FALSE}\NormalTok{)                        }\OperatorTok{+}
+\StringTok{        }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{"bottom"}\NormalTok{)}
+
+
+\KeywordTok{png}\NormalTok{(}\StringTok{"morphology.png"}\NormalTok{,}\DataTypeTok{height=}\DecValTok{600}\NormalTok{); }\KeywordTok{print}\NormalTok{(morphology)}
+
+\CommentTok{#}
+\CommentTok{# Plot first two components}
+\CommentTok{#}
+\NormalTok{plot12 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(crabs, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ PC1, }\DataTypeTok{y =}\NormalTok{ PC2, }\DataTypeTok{pch=}\NormalTok{sex, }\DataTypeTok{col=}\NormalTok{sp, }\DataTypeTok{size=}\NormalTok{sex)) }\OperatorTok{+}
+\StringTok{        }\KeywordTok{geom_point}\NormalTok{()                                                    }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_x_continuous}\NormalTok{(}\StringTok{"First Principle Component"}\NormalTok{)                 }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_y_continuous}\NormalTok{(}\StringTok{"Second Principle Component"}\NormalTok{)                }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_shape_manual}\NormalTok{(}\StringTok{"Sex"}\NormalTok{,}\DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{15}\NormalTok{))                        }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_color_manual}\NormalTok{(}\StringTok{"Crab}\CharTok{\textbackslash{}n}\StringTok{Species"}\NormalTok{,}\DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{,}\StringTok{"orange3"}\NormalTok{))  }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_size_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\DecValTok{3}\NormalTok{),}\DataTypeTok{guide=}\OtherTok{FALSE}\NormalTok{)                    }\OperatorTok{+}
+\StringTok{        }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{"bottom"}\NormalTok{)}
+
+\KeywordTok{png}\NormalTok{(}\StringTok{"first_components.png"}\NormalTok{,}\DataTypeTok{height=}\DecValTok{600}\NormalTok{); }\KeywordTok{print}\NormalTok{(plot12)}
+
+\CommentTok{#}
+\CommentTok{# Plot second two components}
+\CommentTok{#}
+\NormalTok{plot23 <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(crabs, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ PC2, }\DataTypeTok{y =}\NormalTok{ PC3, }\DataTypeTok{pch=}\NormalTok{sex, }\DataTypeTok{col=}\NormalTok{sp, }\DataTypeTok{size=}\NormalTok{sex)) }\OperatorTok{+}
+\StringTok{        }\KeywordTok{geom_point}\NormalTok{()                                                    }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_x_continuous}\NormalTok{(}\StringTok{"Second Principle Component"}\NormalTok{)                }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_y_continuous}\NormalTok{(}\StringTok{"Third Principle Component"}\NormalTok{)                 }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_shape_manual}\NormalTok{(}\StringTok{"Sex"}\NormalTok{,}\DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{15}\NormalTok{))                        }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_color_manual}\NormalTok{(}\StringTok{"Crab}\CharTok{\textbackslash{}n}\StringTok{Species"}\NormalTok{,}\DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{,}\StringTok{"orange3"}\NormalTok{))  }\OperatorTok{+}
+\StringTok{        }\KeywordTok{scale_size_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{,}\DecValTok{3}\NormalTok{),}\DataTypeTok{guide=}\OtherTok{FALSE}\NormalTok{)                    }\OperatorTok{+}
+\StringTok{        }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position =} \StringTok{"bottom"}\NormalTok{)}
+
+\KeywordTok{png}\NormalTok{(}\StringTok{"second_components.png"}\NormalTok{,}\DataTypeTok{height=}\DecValTok{600}\NormalTok{); }\KeywordTok{print}\NormalTok{(plot23)}
+\end{Highlighting}
+\end{Shaded}
+
+Load the functions with dataframe and covariance matrix
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{data}\NormalTok{(iris)}
+\NormalTok{iris_subs <-}\StringTok{ }\NormalTok{iris[,}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{4}\NormalTok{)]}
+\NormalTok{species <-}\StringTok{ }\NormalTok{iris[,}\DecValTok{5}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Run PCA, ICA, and NMF on the iris dataset.
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\tightlist
+\item
+  Explain your inputs and outputs from each algorithm. For instance, in
+  the input for the NMF example above, out inputs were a 25 x 8
+  matrix,and a rank of 4. The output was a matrix W with dimensions
+  25x4, and a matrix H with dimensions 4x8. We plotted the basis matrix
+  (W), where each columns corresponds to a feature\ldots{} etc.
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Use the silhouette function in the cluster package to find the optimal
+  number of clusters for kmeans for the iris dataset. Then cluster using
+  hierarchical clustering and kmeans clustering. Does the data cluster
+  by species?
+\end{enumerate}
+
+\hypertarget{optional-material}{%
+\section{Optional material}\label{optional-material}}
+
+On PCA:
+
+Eigen Vectors and Eigen Values
+\url{http://www.visiondummy.com/2014/03/eigenvalues-eigenvectors/}
+Linear Algebra by Prof.~Gilbert Strang
+\url{https://ocw.mit.edu/courses/mathematics/18-06-linear-algebra-spring-2010/video-lectures/}
+\url{http://www.cs.otago.ac.nz/cosc453/student_tutorials/principal_components.pdf}
+\url{https://stats.stackexchange.com/questions/2691/making-sense-of-principal-component-analysis-eigenvectors-eigenvalues}
+
+On ICA:
+
+Independent Component Analysis: Algorithms and Applications
+\url{https://www.cs.helsinki.fi/u/ahyvarin/papers/NN00new.pdf} Tutorial
+on ICA taken from
+\url{http://rstudio-pubs-static.s3.amazonaws.com/93614_be30df613b2a4707b3e5a1a62f631d19.html}
+
+
+\end{document}
